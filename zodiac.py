@@ -1,5 +1,6 @@
 import sys
 import builtins
+import types
 import imp
 
 class MonkeyPatchingError(Exception):
@@ -33,10 +34,12 @@ def rebase_class(cls, target, new_name=None):
 			new_bases.append(new_base)
 		else:
 			new_bases.append(base)
+	new_bases = tuple(new_bases)
 
 	new_cls = type(new_name, new_bases, dict())
 
-	for name, item in cls.__dict__:
+	for name, item in cls.__dict__.items():
+		if name in ('__dict__', '__name__', '__doc__'): continue
 		rebase(item, new_cls, name)
 
 def rebase(obj, target, new_name=None):
@@ -50,23 +53,25 @@ def rebase(obj, target, new_name=None):
 	else:
 		setattr(target, new_name, obj) 
 
-def build_patch():
-	mod = imp.new_module(__target__)
-	mod._real = __import__(__target__)
+def build_patch(patch):
+	mod = imp.new_module(patch.__target__)
+	real = __import__(patch.__target__)
 	
-	for name in _real.__all__:
-		val = getattr(_real, name)
+	for name in real.__dict__:
+		if name.startswith('_'): continue
+
+		val = getattr(real, name)
 		if isinstance(name, (int, str, bytes)):
 			setattr(mod, name, val)
 
-	for name in __before__:
-		rebase(getattr(_real, name), mod, name)
+	for name in patch.__before__:
+		rebase(getattr(real, name), mod, name)
 
-	for name in __implements__:
-		setattr(mod, name, globals()[name])
+	for name in patch.__implements__:
+		rebase(getattr(patch, name), mod, name)
 	
-	for name in __after__:
-		obj = getattr(_real, name)
+	for name in patch.__after__:
+		obj = getattr(real, name)
 		rebase(obj, mod, name)
 
 	return mod
