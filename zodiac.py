@@ -39,8 +39,10 @@ def rebase_class(cls, target, new_name=None):
 	new_cls = type(new_name, new_bases, dict())
 
 	for name, item in cls.__dict__.items():
-		if name in ('__dict__', '__name__', '__doc__'): continue
+		if name in ('__dict__', '__name__', '__module__', '__doc__'): continue
 		rebase(item, new_cls, name)
+
+	setattr(target, new_name, new_cls)
 
 def rebase(obj, target, new_name=None):
 	if not new_name:
@@ -68,7 +70,7 @@ def build_patch(patch):
 		rebase(getattr(real, name), mod, name)
 
 	for name in patch.__implements__:
-		rebase(getattr(patch, name), mod, name)
+		setattr(mod, name, getattr(patch, name))
 	
 	for name in patch.__after__:
 		obj = getattr(real, name)
