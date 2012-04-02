@@ -25,15 +25,15 @@ class Foo(object):
 #inheritance
 class Inheritor1(Foo):
 	def __init__(self):
-		Foo.__init__(self)
+		super(Inheritor1, self).__init__()
 
 class Inheritor2(Foo):
 	def __init__(self):
-		super(Inheritor2, self).__init__(self)
+		super().__init__()
 
 class Inheritor3(Foo):
 	def __init__(self):
-		super().__init__(self)
+		Foo.__init__(self)
 
 #methods
 def user1():

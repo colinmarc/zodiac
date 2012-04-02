@@ -32,7 +32,7 @@ class Foo(_real.Foo):
 		return _real.Requirement().val
 
 def new1():
-	return req1()
+	return _real.req1()
 
 def new2():
-	return Foo().val()
+	return Foo().val
