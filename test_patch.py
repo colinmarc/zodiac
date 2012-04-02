@@ -1,12 +1,13 @@
+_real = __import__('test_orig')
 
-__target__ = 'orig'
+__target__ = 'test_orig'
 
 __before__ = [
 	'req1',
 	'Requirement'
 ]
 
-__implements = [
+__implements__ = [
 	'Foo',
 	'new1',
 	'new2'

@@ -83,7 +83,7 @@ def replace_module(name, replacement):
 	if real:
 		hidden_modules[name] = real
 
-	sys.modules[name] = dest_module
+	sys.modules[name] = replacement
 
 def restore_module(name):
 	sys.modules[name] = hidden_modules[name]

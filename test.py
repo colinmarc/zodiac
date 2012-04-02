@@ -1,17 +1,17 @@
 from zodiac import monkeypatch
 monkeypatch('test_patch', 'test_orig')
 
-import orig
+import test_orig as mod
 
-assert orig.req1 == 'orig'
+assert mod.req1() == 'old'
 
-assert Foo().val == 'new'
-assert Foo().req2() == 'new'
-assert Foo().req3() == 'new'
+assert mod.Foo().val == 'new'
+assert mod.Foo().req2() == 'old'
+assert mod.Foo().req3() == 'old'
 
-assert orig.Inheritor1().val() == 'new'
-assert orig.Inheritor2().val() == 'new'
-assert orig.Inheritor3().val() == 'new'
+assert mod.Inheritor1().val() == 'new'
+assert mod.Inheritor2().val() == 'new'
+assert mod.Inheritor3().val() == 'new'
 
-assert user1() == 'new'
-assert user2() == 'new'
+assert mod.user1() == 'new'
+assert mod.user2() == 'new'
