@@ -5,27 +5,6 @@ import imp
 class MonkeyPatchingError(Exception):
 	pass
 
-def monkeypatch(source, dest):
-	source_module = __import__(source)
-	dest_module = __import__(dest)
-	imports = getattr(source_module, '__imports__', [])
-	implements = getattr(source_module, '__implements__', [])
-	
-	missing = set(dir(dest_module)) - set(dir(source_module)) - set(implements) - set(imports)
-	if missing:
-		error = "{0} items not implemented or imported: \n\t{1}"
-		raise MonkeyPatchingError(error.format(len(missing), '\n\t'.join(missing)))
-
-	setattr(dest_module, '__monkeypatched__', True)
-	for name in imports:
-		thing = getattr(source_module, name)
-		if not thing:
-			raise MonkeyPatchingError("invalid import: {0}".format(name))
-
-		setattr(dest_module, name, thing)
-
-	sys.modules[dest] = dest_module
-
 def rebase_function(f, target, new_name=None):
 	if not new_name:
 		new_name = f.__name__
@@ -55,18 +34,21 @@ def rebase_class(cls, target, new_name=None):
 		else:
 			new_bases.append(base)
 
-	new_dict = {}
-	for name, item in cls.__dict__:
-		new_item = getattr(target, name, False)	
-		if item:
-			if isinstance(item, type):
-				rebase_class(item, new_dict)
-			elif isinstance(item, types.FunctionType)
-				rebase_function(item, new_dict)
-		else:
-			new_dict[name] = item
+	new_cls = type(new_name, new_bases, dict())
 
-	new_cls = type(new_name, new_bases, new_dict)
+	for name, item in cls.__dict__:
+		rebase(item, new_cls, name)
+
+def rebase(obj, target, new_name=None):
+	if not new_name:
+		new_name = obj.__name__
+
+	if isinstance(obj, type):
+		rebase_class(obj, target, new_name)
+	elif isinstance(obj, types.FunctionType):
+		rebase_function(obj, target, new_name)
+	else:
+		setattr(target, new_name, obj) 
 
 def build_patch():
 	mod = imp.new_module(__target__)
@@ -78,19 +60,33 @@ def build_patch():
 			setattr(mod, name, val)
 
 	for name in __before__:
-		setattr(mod, name, getattr(_real, name))
+		rebase(getattr(_real, name), mod, name)
 
 	for name in __implements__:
 		setattr(mod, name, globals()[name])
 	
 	for name in __after__:
 		obj = getattr(_real, name)
-
-		if isinstance(obj, types.FunctionType):
-
-		setattr(mod, name, obj)
+		rebase(obj, mod, name)
 
 	return mod
+
+hidden_modules = {}
+
+def replace_module(name, replacement):
+	real = sys.modules.get(name, False)
+	if real:
+		hidden_modules[name] = real
+
+	sys.modules[name] = dest_module
+
+def restore_module(name):
+	sys.modules[name] = hidden_modules[name]
+	del hidden_modules[name]
+
+def monkeypatch(source, dest):
+	source_module = build_patch(__import__(source))
+	replace_module(dest, source_module)
 
 def diff(source, dest):
 	pass
