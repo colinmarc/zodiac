@@ -39,7 +39,7 @@ Patching globally is simple.
 	>>> import socket
 	>>> s = socket.socket()
 	passthrough!
-	>>> socket.mycrazyfunction()
+	>>> socket.something_new()
 	new function
 
 Check out the tests for more examples. 
