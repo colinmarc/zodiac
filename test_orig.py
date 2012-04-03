@@ -1,7 +1,6 @@
-#before
-
 CONSTANT = 1
 
+#existing
 def req1():
 	return 'old'
 
@@ -14,14 +13,10 @@ class Requirement(object):
 	def __init__(self):
 		self.val = 'old'
 
-#implemented
-
 class Foo(object):
 	def __init__(self):
 		self.val = 'old'
 	
-#after
-
 #inheritance
 class Inheritor1(Foo):
 	def __init__(self):

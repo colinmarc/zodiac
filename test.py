@@ -3,6 +3,8 @@ monkeypatch('test_patch', 'test_orig')
 
 import test_orig as mod
 
+assert mod.CONSTANT == 1
+
 assert mod.req1() == 'old'
 
 assert mod.Foo().val == 'new'
