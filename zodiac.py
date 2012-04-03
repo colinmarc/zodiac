@@ -3,6 +3,7 @@ import builtins
 import types
 import imp
 
+
 def _create_closure_cell(obj):
 	def ret(): obj
 	return ret.__closure__[0]
@@ -104,11 +105,3 @@ def monkeypatch(source, dest):
 	patch = build_patch(dest, source)
 	replace_module(dest, patch)
 
-#utilities
-
-def diff(source, dest):
-	pass
-
-def test(name, test_name=None):
-	pass
-	
