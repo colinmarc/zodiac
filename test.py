@@ -18,3 +18,5 @@ assert mod.Inheritor3().val == 'new'
 
 assert mod.user1() == 'new'
 assert mod.user2() == 'new'
+
+print('success!')
