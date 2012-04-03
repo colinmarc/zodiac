@@ -1,5 +1,5 @@
 from zodiac import monkeypatch
-monkeypatch('test_patch', 'test_orig')
+monkeypatch('test_orig', 'test_patch')
 
 import test_orig as mod
 

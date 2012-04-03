@@ -101,7 +101,7 @@ def restore_module(name):
 	sys.modules[name] = hidden_modules[name]
 	del hidden_modules[name]
 
-def monkeypatch(source, dest):
+def monkeypatch(dest, source):
 	patch = build_patch(dest, source)
 	replace_module(dest, patch)
 
