@@ -6,12 +6,10 @@ import imp
 class MonkeyPatchingError(Exception):
 	pass
 
-def rebase_function(f, target, new_name=None):
+def rebase_function(f, target, new_name=None, ns=None):
 	if not new_name:
 		new_name = f.__name__
-
-	ns = {'__builtins__': builtins}
-	ns.update(target.__dict__)
+	ns = ns or dict()
 
 	new_f = types.FunctionType(
 		f.__code__,
@@ -23,9 +21,10 @@ def rebase_function(f, target, new_name=None):
 
 	setattr(target, new_name, new_f)
 
-def rebase_class(cls, target, new_name=None):
+def rebase_class(cls, target, new_name=None, ns=None):
 	if not new_name:
 		new_name = cls.__name__
+	ns = ns or dict()
 
 	new_bases = []
 	for base in cls.__bases__:
@@ -37,26 +36,26 @@ def rebase_class(cls, target, new_name=None):
 	new_bases = tuple(new_bases)
 
 	new_cls = type(new_name, new_bases, dict())
+	ns[new_name] = new_cls
 
 	for name, item in cls.__dict__.items():
-		if name in ('__dict__', '__name__', '__module__', '__doc__'): continue
-		rebase(item, new_cls, name)
+		if name in ('__dict__', '__bases__', '__weakref__', '__name__', '__module__', '__doc__'): continue
+		rebase(item, new_cls, name, ns)
 
 	setattr(target, new_name, new_cls)
 
-def rebase(obj, target, new_name=None):
-	if not new_name:
-		new_name = obj.__name__
+def rebase(obj, target, new_name=None, ns=None):
 
 	if isinstance(obj, type):
 		rebase_class(obj, target, new_name)
 	elif isinstance(obj, types.FunctionType):
-		rebase_function(obj, target, new_name)
+		rebase_function(obj, target, new_name, ns)
 	else:
 		setattr(target, new_name, obj) 
 
 def build_patch(patch):
 	mod = imp.new_module(patch.__target__)
+	mod.__builtins__ = builtins
 	real = __import__(patch.__target__)
 	
 	for name in real.__dict__:
@@ -67,14 +66,14 @@ def build_patch(patch):
 			setattr(mod, name, val)
 
 	for name in patch.__before__:
-		rebase(getattr(real, name), mod, name)
+		rebase(getattr(real, name), mod, name, mod.__dict__)
 
 	for name in patch.__implements__:
 		setattr(mod, name, getattr(patch, name))
 	
 	for name in patch.__after__:
 		obj = getattr(real, name)
-		rebase(obj, mod, name)
+		rebase(obj, mod, name, mod.__dict__)
 
 	return mod
 
