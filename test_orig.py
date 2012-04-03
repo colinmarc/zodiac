@@ -29,11 +29,11 @@ class Inheritor1(Foo):
 
 class Inheritor2(Foo):
 	def __init__(self):
-		super().__init__()
+		Foo.__init__(self)
 
 class Inheritor3(Foo):
 	def __init__(self):
-		Foo.__init__(self)
+		super().__init__()
 
 #methods
 def user1():

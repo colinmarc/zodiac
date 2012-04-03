@@ -22,6 +22,7 @@ __after__ = [
 ]
 
 class Foo(_real.Foo):
+
 	def __init__(self):
 		self.val = 'new'
 
