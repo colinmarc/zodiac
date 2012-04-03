@@ -3,9 +3,6 @@ import builtins
 import types
 import imp
 
-class MonkeyPatchingError(Exception):
-	pass
-
 def _create_closure_cell(obj):
 	def ret(): obj
 	return ret.__closure__[0]
