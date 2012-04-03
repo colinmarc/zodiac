@@ -70,28 +70,24 @@ def rebase(obj, target, new_name=None, ns=None):
 	else:
 		setattr(target, new_name, obj) 
 
-def build_patch(patch):
-	mod = imp.new_module(patch.__target__)
+def build_patch(original_module, patch_module):
+	original = __import__(original_module)
+	patch = __import__(patch_module)
+
+	mod = imp.new_module(patch_module)
 	mod.__builtins__ = builtins
-	real = __import__(patch.__target__)
-	
-	for name in real.__dict__:
-		if name.startswith('_'): continue
 
-		val = getattr(real, name)
-		if isinstance(name, (int, str, bytes)):
-			setattr(mod, name, val)
-
-	for name in patch.__before__:
-		rebase(getattr(real, name), mod, name, mod.__dict__)
-
-	for name in patch.__implements__:
+	for name in patch.__dict__:
+		if name.startswith('__'): continue
 		setattr(mod, name, getattr(patch, name))
 	
-	for name in patch.__after__:
-		obj = getattr(real, name)
-		rebase(obj, mod, name, mod.__dict__)
+	for name in original.__dict__:
+		if name.startswith('__') or name in patch.__dict__:
+			continue
 
+		val = getattr(original, name)
+		rebase(val, mod, name, mod.__dict__)
+		
 	return mod
 
 hidden_modules = {}
@@ -108,8 +104,10 @@ def restore_module(name):
 	del hidden_modules[name]
 
 def monkeypatch(source, dest):
-	source_module = build_patch(__import__(source))
-	replace_module(dest, source_module)
+	patch = build_patch(dest, source)
+	replace_module(dest, patch)
+
+#utilities
 
 def diff(source, dest):
 	pass
