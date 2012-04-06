@@ -50,7 +50,7 @@ why is this different?
 If you were to try monkeypatching without zodiac, you might do something like this:
 
 	import socket as _real
-	create_connection = _real.create_connection #etc
+	create_connection = _real.create_connection #and so on
 
 	class socket(_real.socket):
 		def __init__(self, *args, **kwargs):
@@ -61,9 +61,9 @@ But this breaks, because `create_connection` uses the socket class that was arou
 
 	>>> import mysocket as socket
 	>>> conn = mysocket.create_connection(('python.org', 9599))
-	>>> #hm, no passthrough
+	>>> #hrm, no passthrough?
 
-So what these libraries do is copy the `create_connection` code wholesale from the system module, and don't change a thing. But by redefining it, it uses our socket:
+The solution (if you're not using zodiac) is to copy `create_connection` code wholesale from the system module. By redefining it, it uses our socket:
 
 	import socket as _real
 
@@ -75,7 +75,9 @@ So what these libraries do is copy the `create_connection` code wholesale from t
 	def create_connection(...):
 		#copy pasta of python socket.create_connection code
 
-This works, but has obvious problems. You're tied to the original code, and maintaining between different versions of system code is a nightmare! zodiac "rebases" those functions that you would have to redefine into the namespace of the new module, which is populated with whatever you overrode in your patch. So your patches can be clean and concise.
+This works, but has obvious problems. You're tied to the original code, and maintaining between different versions of system code is a nightmare.
+
+zodiac "rebases" those functions into the namespace of the new module, which is populated with whatever you overrode in your patch. So your patches can be clean and concise.
 
 installation
 ------------
