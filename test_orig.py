@@ -1,3 +1,5 @@
+import sys
+
 CONSTANT = 1
 
 #existing
@@ -26,9 +28,12 @@ class Inheritor2(Foo):
 	def __init__(self):
 		Foo.__init__(self)
 
-class Inheritor3(Foo):
-	def __init__(self):
-		super().__init__()
+if sys.version_info[0] >= 3:
+	class Inheritor3(Foo):
+		def __init__(self):
+			super().__init__()
+else:
+	Inheritor3 = Inheritor2
 
 #methods
 def user1():
