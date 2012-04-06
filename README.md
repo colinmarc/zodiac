@@ -1,7 +1,7 @@
 zodiac - unite monkey and snake
 =================================
 
-zodiac makes monkeypatching really easy in python. It lets you weave parts of the original module with a patch module that you write. It was written for python 3, but also works in 2.7 (actually, not yet. but it will).
+zodiac makes monkeypatching really easy in python. It lets you weave parts of the original module with a patch module that you write. It was written for python 3, but also works in 2.7.
 
 what?
 ----

@@ -1,5 +1,8 @@
 import sys
-import builtins
+try:
+	import builtins
+except ImportError:
+	builtins = __builtins__
 import types
 import imp
 
