@@ -44,5 +44,46 @@ Patching globally is simple.
 
 Check out the tests for more examples. 
 
+why is this different?
+----------------------
+
+The way monkeypatching is done currently in some projects involves a lot of reproduced code. Without zodiac, you could write a patch module similar to the one before, importing functions like `create_connection` from the system `socket` library to match the interface.
+
+	import socket as _real
+	create_connection = _real.create_connection #et cetera
+
+	class socket(_real.socket):
+		def __init__(self, *args, **kwargs):
+			print("passthrough!")
+			super().__init__()
+
+But this breaks, because `create_connection` uses the socket class that was around when it was defined, and not ours:
+
+	>>> import mysocket as socket
+	>>> conn = mysocket.create_connection(('python.org', 9599))
+	>>> #hm, no passthrough
+
+So what these libraries do is copy the `create_connection` code wholesale from the system module, and don't change a thing. But by redefining it, it uses our socket:
+
+	import socket as _real
+
+	class socket(_real.socket):
+		def __init__(self, *args, **kwargs):
+			print("passthrough!")
+			super().__init__()
+
+	def create_connection(...):
+		#copy pasta of python socket.create_connection code
+
+This works, but ties you to the original code, but has obvious problems. You're tied to the original code, and maintaining between different versions of system code is a nightmare! zodiac "rebases" those functions that you would have to redefine into the namespace of the new module, which is populated with whatever you overrode in your patch. So your patches can be clean and concise.
+
+installation
+------------
+
+zodiac requires python 2.7 or higher. Clone, cd into the directory, and then
+
+    python setup.py install
+
+
 [socket]: http://docs.python.org/py3k/library/socket.html
 
