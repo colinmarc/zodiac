@@ -47,10 +47,10 @@ Check out the tests for more examples.
 why is this different?
 ----------------------
 
-The way monkeypatching is done currently in some projects involves a lot of reproduced code. Without zodiac, you could write a patch module similar to the one before, importing functions like `create_connection` from the system `socket` library to match the interface.
+If you were to try monkeypatching without zodiac, you might do something like this:
 
 	import socket as _real
-	create_connection = _real.create_connection #et cetera
+	create_connection = _real.create_connection #etc
 
 	class socket(_real.socket):
 		def __init__(self, *args, **kwargs):
@@ -75,7 +75,7 @@ So what these libraries do is copy the `create_connection` code wholesale from t
 	def create_connection(...):
 		#copy pasta of python socket.create_connection code
 
-This works, but ties you to the original code, but has obvious problems. You're tied to the original code, and maintaining between different versions of system code is a nightmare! zodiac "rebases" those functions that you would have to redefine into the namespace of the new module, which is populated with whatever you overrode in your patch. So your patches can be clean and concise.
+This works, but has obvious problems. You're tied to the original code, and maintaining between different versions of system code is a nightmare! zodiac "rebases" those functions that you would have to redefine into the namespace of the new module, which is populated with whatever you overrode in your patch. So your patches can be clean and concise.
 
 installation
 ------------
