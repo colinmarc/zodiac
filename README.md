@@ -18,7 +18,7 @@ let's say you are monkeypatching [socket][]. You can write a patch module, `myso
 	def something_new():
 		print("new function")
 
-This lets you create a patched module with just the parts you want overridden.
+This lets you create a patched module based on the original module, with only the parts you want overridden.
 
 	>>> from zodiac import build_patch
 	>>> mysocket = build_patch('socket', 'mysocket')
