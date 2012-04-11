@@ -35,6 +35,11 @@ if sys.version_info[0] >= 3:
 else:
 	Inheritor3 = Inheritor2
 
+class Slots:
+	__slots__ = ('prop',)
+	def __init__(self):
+		self.prop = Foo()
+
 #methods
 def user1():
 	return Foo().val

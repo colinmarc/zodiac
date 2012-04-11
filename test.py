@@ -18,6 +18,8 @@ assert mod.Inheritor1().val == 'new'
 assert mod.Inheritor2().val == 'new'
 assert mod.Inheritor3().val == 'new'
 
+assert mod.Slots().prop.val == 'new'
+
 assert mod.user1() == 'new'
 assert mod.user2() == 'new'
 

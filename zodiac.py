@@ -57,7 +57,8 @@ def rebase_class(cls, target, new_name=None, ns=None):
 	new_cls._my_class = new_cls
 
 	for name, item in cls.__dict__.items():
-		if name in ('__dict__', '__bases__', '__weakref__', '__name__', '__module__', '__doc__'): continue
+		if name in ('__dict__', '__slots__', '__bases__', '__weakref__', '__name__', '__module__', '__doc__'): continue
+		if isinstance(item, types.MemberDescriptorType): continue
 		rebase(item, new_cls, name, ns)
 
 	setattr(target, new_name, new_cls)
