@@ -1,6 +1,8 @@
 zodiac - unite monkey and snake
 =================================
 
+**note: this was just an experiment, and is (obviously) abandoned.**
+
 zodiac makes monkeypatching really easy in python. It lets you weave parts of the original module with a patch module that you write. It was written for python 3, but also works in 2.7.
 
 what?
